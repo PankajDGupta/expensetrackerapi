@@ -3,8 +3,10 @@ from unittest import TestCase
 
 # Create your tests here.
 def two_int_sum(a, b):
-    # return a + b
-    return 0
+    return a + b
+
+
+# return 0
 
 
 class TestSum(TestCase):
