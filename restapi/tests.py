@@ -14,3 +14,7 @@ class TestModels(TestCase):
         self.assertEqual("amazon", inserted_exp.merchant)
         self.assertEqual("amc hadphone", inserted_exp.description)
         self.assertEqual("music", inserted_exp.category)
+
+
+class TestViews(TestCase):
+    pass
