@@ -1,5 +1,6 @@
 from django.test import TestCase
 from restapi import models
+from django.urls import reverse  # we are using this to track back the urls in restapi
 
 
 class TestModels(TestCase):
@@ -17,4 +18,31 @@ class TestModels(TestCase):
 
 
 class TestViews(TestCase):
-    pass
+    def test_expense_create(self):
+        payload = {
+            "amount": 50,
+            "merchant": "ATnT",
+            "description": "Cell phone desc",
+            "category": "utilities",
+        }
+
+        res = self.client.post(
+            reverse("restapi:expense-list-create"), payload, format="json"
+        )
+        self.assertEqual(
+            201, res.status_code
+        )  # for creation we get 201 as the status code
+        json_response = res.json()
+        self.assertEqual(str(payload["amount"]), json_response["amount"])
+        self.assertEqual(str(payload["merchant"]), json_response["merchant"])
+        self.assertEqual(str(payload["description"]), json_response["description"])
+        self.assertEqual(str(payload["category"]), json_response["category"])
+        self.assertIsInstance(json_response["id"], int)
+
+    def test_expense_list(self):
+        res = self.client.get(reverse("restapi:expense-list-create"), format="json")
+        self.assertEqual(200, res.status_code)
+        json_res = res.json()
+        self.assertIsInstance(json_res, list)
+        expenses = models.Expense.objects.all()
+        self.assertEqual(len(expenses), len(json_res))
