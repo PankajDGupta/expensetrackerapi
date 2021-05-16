@@ -59,5 +59,35 @@ class TestViews(TestCase):
             reverse("restapi:expense-list-create"), payload, format="json"
         )
 
-        # print("test_expense_create_required_fields_missing :" + str(res.status_code))
+        # this is a negative test where we are testing that if a required field is not sent then  the app should return 400 response
         self.assertEqual(400, res.status_code)
+
+    def test_expense_retrive(self):
+        expense = models.Expense.objects.create(
+            amount=300, merchant="George", description="loan", category="transfer"
+        )
+        res = self.client.get(
+            reverse("restapi:expense-retrieve-delete", args=[expense.id]), format="json"
+        )
+
+        # return code for a resource deletion is 200
+        self.assertEqual(200, res.status_code)
+        res_json = res.json()
+        self.assertEqual(expense.id, res_json["id"])
+        self.assertEqual(expense.amount, res_json["amount"])
+        self.assertEqual(expense.merchant, res_json["merchant"])
+        self.assertEqual(expense.description, res_json["description"])
+        self.assertEqual(expense.category, res_json["category"])
+
+    def test_expense_delete(self):
+        # return code for a resource deletion is 204
+        expense = models.Expense.objects.create(
+            amount=400, merchant="john", description="loan", category="transfer"
+        )
+        res = self.client.delete(
+            reverse("restapi:expense-retrieve-delete", args=[expense.id]), format="json"
+        )
+        self.assertEqual(204, res.status_code)
+
+        exp = models.Expense.objects.filter(pk=expense.id).exists()
+        self.assertFalse(exp)
